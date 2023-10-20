@@ -1,0 +1,103 @@
+---
+title: "Assignment 2"
+format: html
+editor: source
+---
+
+
+## Q3
+
+a) Plotting the trends to show there is a point where the college and highschool earnings flip in terms of which is greater. 
+
+```{r}
+f_hs = function(x1, x2) {50 + 20*x1 + 0.07*x2 + 0.01*x1*x2}
+f_college = function(x1, x2) {50 + 20*x1 + 0.07*x2 + 35 + 0.01*x1*x2 - 10*x1}
+
+x1 = seq(0, 100, 1)
+x2 = seq(0, 100, 1)
+
+plot(x1, f_college(x1, x2), type = "l", col = "blue", xlim = c(0, 5), ylim = c(0, 250))
+lines(x1, f_hs(x1, x2), type = "l", col = "red", xlim = c(0, 5), ylim = c(0, 250))
+```
+
+Notice highschool makes more only for x1 < 3.5 
+
+## Q10
+
+```{r}
+library(ISLR2)
+data(Carseats)
+```
+
+### (a)
+
+```{r}
+fit = lm(Sales ~ Price + Urban + US, data = Carseats)
+summary(fit)
+```
+
+### (b)
+
+For a one unit increase in price we see a 0.054 unit decrease in sales. 
+For a store in an urban area we see a 0.02 unit increase in sales. 
+For a store in the US we see a 1.2 unit increase in sales.
+
+### (c)
+
+The model in full equation form is the following: 
+
+$$Price = 13.043 + 0.054*Price - 0.021*Urban + 1.2*US$$
+
+I also accept answers which include showing the cases for Urban and US, but do not require this.
+
+### (d)
+
+We can reject the null hypothesis for Price and US. 
+
+### (e)
+
+```{r}
+fit2 = lm(Sales ~ Price + US, data = Carseats)
+summary(fit2)
+```
+
+### (f)
+
+We can see how well the models in (a) and (e) fit the data by looking at the R-squared values. The model in (a) has an R-squared value of 0.2397 and the model in (e) has an R-squared value of 0.2396. The model in (a) is slightly better at predicting the data, but the two have very similar fits. 
+
+```{r}
+summary(fit)$r.squared
+summary(fit2)$r.squared
+```
+
+### (g)
+
+We can get the 95% CIs for the coefficients by using the confint() function. 
+
+```{r}
+confint(fit2, parm = c("(Intercept)", "Price", "USYes"), level = 0.95)
+confint(fit, parm = c("(Intercept)", "Price", "USYes"), level = 0.95)
+```
+
+### (h)
+
+To detect outliers in the model from (e) we can use the plot() function. We do not see any points falling outside the -3 to 3 range on the Normal Q-Q plot, so we do not have any outliers.
+Similarly, we can identify high leverage points from the Residuals vs Leverage plot. 
+We do see there are a couple of high leverage points. 
+
+Some students go further and identify the points using the rule of thumb for the outlier statistic defined in the textbook: 
+
+>  For a simple linear regression,
+$$h_i = \frac{1}{n} + \frac{(x_i - \bar x)^2}{\sum_{i'=1}^n (x_i'-\bar x)^2}$$
+It is clear from this equation that $h_i$ increases with the distance of $x_i$ from $\bar x$.
+There is a simple extension of $h_i$ to the case of multiple predictors, though
+we do not provide the formula here. The leverage statistic $h_i$ is always
+between $1/n$ and $1$, and the average leverage for all the observations is
+always equal to $(p + 1)/n$. So if a given observation has a leverage statistic
+that greatly exceeds $(p+1)/n$, then we may suspect that the corresponding
+point has high leverage.
+
+```{r}
+par(mfrow = c(2, 2))
+plot(fit2)
+```
